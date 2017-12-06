@@ -4,9 +4,9 @@ Borrar de alcances
 4.1Sin numeral el tipo de investigación
 
 Cita en la figura
-[14:30, 29/11/2017] 
+
 Tomado de ....
-[14:31, 29/11/2017]
+
 Cambiar. Pregunta del problema
  Cómo realizar o efectuar la supervisión de la impresora 3D
 
@@ -56,7 +56,7 @@ Derechos de uso
 
 Eliminar variables
 Explicar las figuras
-[14:58, 29/11/2017]
+
  Antecedentes locales y regionsles
 
 Sujeto y complementos
