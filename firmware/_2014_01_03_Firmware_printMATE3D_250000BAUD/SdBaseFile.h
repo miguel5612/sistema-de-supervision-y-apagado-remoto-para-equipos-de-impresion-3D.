@@ -34,14 +34,14 @@
  * \struct fpos_t
  * \brief internal type for istream
  * do not use in user apps
- */
+ 
 struct fpos_t {
   /** stream position */
-  uint32_t position;
+ // uint32_t position;
   /** cluster for position */
-  uint32_t cluster;
-  fpos_t() : position(0), cluster(0) {}
-};
+ // uint32_t cluster;
+ // fpos_t() : position(0), cluster(0) {}
+//};
 
 // use the gnu style oflag in open()
 /** open() oflag for reading */
