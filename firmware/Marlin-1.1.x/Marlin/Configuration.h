@@ -523,20 +523,20 @@
  * total number of extruders, the last value applies to the rest.
  */
 //#define DISTINCT_E_FACTORS
-
+// PARA CONSULTAR ESTE ITEM INVESTIGAR BASTANTE Y EMPLEAR ESTA AYUDA https://nathan7.eu/stuff/RepRapCalculator/RepRapCalculator.html
 /**
  * Default Axis Steps Per Unit (steps/mm)
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 53.3333333, 53.3333333, 2560, 3200 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 100, 100, 400, 3200 }
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 3000, 3000, 1000, 10000 }
+#define DEFAULT_MAX_FEEDRATE          { 3000, 3000, 24000, 192000 }
 
 /**
  * Default Max Acceleration (change/s) change = mm/s
@@ -544,7 +544,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 4000 , 4000, 100, 350 }
+#define DEFAULT_MAX_ACCELERATION      { 4000 , 4000, 3000, 350 }
 
 /**
  * Default Acceleration (change/s) change = mm/s
