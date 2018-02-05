@@ -523,13 +523,14 @@
  * total number of extruders, the last value applies to the rest.
  */
 //#define DISTINCT_E_FACTORS
-// PARA CONSULTAR ESTE ITEM INVESTIGAR BASTANTE Y EMPLEAR ESTA AYUDA https://nathan7.eu/stuff/RepRapCalculator/RepRapCalculator.html
+// PARA CONSULTAR ESTE ITEM INVESTIGAR BASTANTE Y EMPLEAR ESTA CALCULADORA https://nathan7.eu/stuff/RepRapCalculator/RepRapCalculator.html
+// LOS PASOS POR mm (steps/mm) DEL EXTRUSOR NORMALMENTE LOS PROVEE EL VENDEDOR DEL EXTRUSOR O EXTRUSOR REMOTO, EN MI CASO USE EL MK8 REMOTE EXTRUDER
 /**
  * Default Axis Steps Per Unit (steps/mm)
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 100, 100, 400, 3200 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 100, 100, 200, 3200 }
 
 /**
  * Default Max Feed Rate (mm/s)
