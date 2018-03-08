@@ -9,14 +9,14 @@
  */
 
 // Librerias
-
+/*
 //Wifi manager.h
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>        
 //
-
+*/
 #include <OneWire.h>
 #include "DHT.h"
 
@@ -34,7 +34,6 @@ extern "C" {
 }
 
 OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature DS18B20(&oneWire);
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -57,10 +56,7 @@ const char* thingspeak_key = "*-*-*-*-*-*-*-*-*-*-*-*-";
  *        
 */
 
-#include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
-
+#include <PCD8544.h>
 /*
  * ATTENTION
  *    because packages esp8266 in OSX not this is path equal to packeges Arduino, if you use board Arduino, dont alter CPP
@@ -138,29 +134,35 @@ void drawRectangle(int x0, int y0, int x1, int y1){
 void setup() {    
     Serial.begin(115200);   
     
-    WiFiManager wifiManager;
-    wifiManager.autoConnect("Sistema de monitoreo V1");
-    Serial.println("El sistema se ha conectado a la red correctamente");
-    delay(1000);
+//    WiFiManager wifiManager;
+//    wifiManager.autoConnect("Sistema de monitoreo V1");
+  //  Serial.println("El sistema se ha conectado a la red correctamente");
+   
   
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  //Serial.println();
+  //Serial.print("Connecting to ");
+  //Serial.println(ssid);
 
-  WiFi.begin(ssid, password);
+//  WiFi.begin(ssid, password);
+  /*
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
+*/
+ // Serial.println("");
+ // Serial.println("WiFi connected");
+ // Serial.print("IP address: ");
+//  Serial.println(WiFi.localIP());
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("LLEGUE1");
   dht.begin();
   
-  // PCD8544-compatible displays may have a different resolution...
+  Serial.println("LLEGUE1");
+   //PCD8544-compatible displays may have a different resolution...
   lcd.begin(84, 48);
+  
+  Serial.println("LLEGUE1");
 
   // Add the smiley to position "0" of the ASCII table
   //library ASCII 0-31 only
@@ -178,9 +180,12 @@ void setup() {
   lcd.createChar(CONST_levelDown, levelDown);
 
   pinMode(D0, OUTPUT);//led NodeMCU v1.0
+
+  Serial.println("LLEGUE1");
 }
 
 void loop() {
+  Serial.println("LLEGUE1");
   digitalWrite(D0, HIGH);//led NodeMCU off
 
   static int counter = 0;//thingspeak received call only between 15 seconds, variable "counter" time controller
@@ -192,19 +197,20 @@ void loop() {
   static int lastCONST_Humid = CONST_levelUp;
 
   float temp;
-  DS18B20.requestTemperatures();
-  delay(1000);
-  temp = DS18B20.getTempCByIndex(0);
-  String voltage = String(system_get_free_heap_size());
-
-  delay(1000);//DHT11 recommends waiting 2 seconds ==> 2000 = 1000(DS18B20)+1000(this)   
+  //DS18B20.requestTemperatures();
+  //delay(1000);
+  //temp = //DS18B20.getTempCByIndex(0);
+  //String voltage = String(system_get_free_heap_size());
+  //String voltage = "10"; //prueba
+  //delay(1000);//DHT11 recommends waiting 2 seconds ==> 2000 = 1000(//DS18B20)+1000(this)   
   float h = dht.readHumidity();
   float t = dht.readTemperature(false, true);
   float hic = dht.computeHeatIndex(t, h, false);
-  
+  Serial.println("LLEGUE1");
   // Use WiFiClient class to create TCP connections
-  WiFiClient client;
+//  WiFiClient client;
   const int httpPort = 80;
+  /*
   if(counter == 0){//thingspeak received call only between 15 seconds, variable "counter" time controller
     if (!client.connect(host, httpPort)) {
       Serial.println("connection failed");
@@ -217,7 +223,7 @@ void loop() {
       url += "&field1=";
       url += String(temp);
       url += "&field2=";
-      url += voltage;
+      url += "voltage";
       url += "&field3=";
       url += h;
       url += "&field4=";
@@ -230,12 +236,14 @@ void loop() {
       Serial.println(""); Serial.print("Requesting URL: "); Serial.println(url);
     }
   }
+  */
   
-  drawRectangle(0,0,35,2);
-  drawRectangle(40,0,75,2);
-  drawRectangle(0,3,75,5);
+  //drawRectangle(0,0,35,2);
+  //drawRectangle(40,0,75,2);
+  //drawRectangle(0,3,75,5);
 
 //temp1
+ /*
   lcd.setCursor(5, 1);
   if(oldTemp1 < temp){
     oldTemp1 = temp;
@@ -266,7 +274,7 @@ void loop() {
   lcd.setCursor(62, 1);
   lcd.write(CONST_degrees);
   lcd.print("C");
-
+*/
 //humidity
   lcd.setCursor(5, 4);
   lcd.print("HUMID ");
@@ -281,10 +289,8 @@ void loop() {
   lcd.print(" ");
   lcd.print((int)(h));
   lcd.print("%");
+  Serial.print("HUMEDAD: ");
+  Serial.println(h);
   
-  counter++;//thingspeak received call only between 15 seconds, variable "counter" time controller
-  if(counter>6){
-    counter = 0;
-  }
     
 }
