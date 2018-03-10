@@ -1,0 +1,6 @@
+https://learn.adafruit.com/building-and-running-micropython-on-the-esp8266/flash-firmware
+
+
+El que funciono con el ESPMOD o ESP8266EX
+
+http://www.instructables.com/id/MicroPython-IoT-Rover-Based-on-WeMos-D1-ESP-8266EX/
