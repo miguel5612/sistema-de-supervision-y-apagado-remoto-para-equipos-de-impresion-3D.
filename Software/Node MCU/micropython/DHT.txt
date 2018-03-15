@@ -1,0 +1,1 @@
+d = dht.DHT11(machine.Pin(5))
