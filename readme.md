@@ -1,4 +1,4 @@
-Sistema de monitoreo para la impresora printmated 3D.
+﻿Sistema de monitoreo para la impresora printmated 3D.
 ==========
 
 El monitoreo y control remoto de las impresoras 3D es fundamental para aumentar la calidad del producto finalizado,
@@ -8,7 +8,7 @@ Printmated3D y que proximamente se extendera para cualquier modelo de impresora 
 
 requisitos:
 --------------------
-
++ Registrarse en el website o puedes implementar tu propio servidor thingspeak (https://github.com/miguel5612/thingspeak)
 
 Hardware:
 --------------------
