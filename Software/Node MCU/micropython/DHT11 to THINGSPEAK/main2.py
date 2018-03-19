@@ -12,7 +12,7 @@ while(true):
 	try:
 
 		publishThingspeak.calculateAndPublish()
-		time.sleep(60)
+		time.sleep(12)
 
 	finally:
 
