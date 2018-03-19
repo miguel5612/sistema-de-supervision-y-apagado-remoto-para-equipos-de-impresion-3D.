@@ -19,4 +19,3 @@ while(True):
 	finally:
 
 		print("exception")
-
