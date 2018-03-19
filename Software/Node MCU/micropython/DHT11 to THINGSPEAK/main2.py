@@ -1,8 +1,7 @@
 import wifimgr
 import publishThingspeak
-import time
 
-while(True):
+while(true):
 
 	wlan = wifimgr.get_connection()
 
