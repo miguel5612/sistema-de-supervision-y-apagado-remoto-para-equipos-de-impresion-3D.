@@ -1,21 +1,24 @@
 import wifimgr
 import publishThingspeak
 import time
-
+print("main invocado")
+time.sleep(10)
+print("main en ejecucion.")
 while(True):
-
+	print("while true")
 	wlan = wifimgr.get_connection()
 
 	if wlan is None:
 
 		print("Could not initialize the network connection.")
-		break
 
 	try:
-
+		print("Tomando muestra y publicando")
 		publishThingspeak.calculateAndPublish()
-		time.sleep(60)
+		print("publicado")
+		time.sleep(10)
+		print("paso el tiempo.")
 
 	finally:
-
-		print("exception")
+		import boardReset
+		boardReset.confirmandreset()

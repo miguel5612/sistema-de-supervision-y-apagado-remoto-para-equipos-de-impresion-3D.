@@ -8,7 +8,6 @@ while(true):
 	if wlan is None:
 
 		print("Could not initialize the network connection.")
-		break
 
 	try:
 

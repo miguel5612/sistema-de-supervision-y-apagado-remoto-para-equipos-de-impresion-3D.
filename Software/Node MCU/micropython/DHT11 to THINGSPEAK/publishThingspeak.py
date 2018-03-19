@@ -27,4 +27,4 @@ def calculateAndPublish():
             import wifimgr
             print("No se pudo imprimir")
             wifimgr.get_connection()
-            pass
+
