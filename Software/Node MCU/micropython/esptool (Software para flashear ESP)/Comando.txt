@@ -1,0 +1,1 @@
+esptool.py --port COM8 write_flash -fm dio -fs 4MB -ff 40m 0x00000 esp8266-20170108-v1.8.7.bin

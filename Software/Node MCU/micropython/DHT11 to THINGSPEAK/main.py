@@ -1,8 +1,7 @@
-import usocket as _socket
-import ussl as ssl
-import dht
-import machine
+import wifimgr
+import publishThingspeak
 import time
+<<<<<<< HEAD
 import wifimgr
 
 API_KEY = 'D9EBWUZRNK5VQRPS' 
@@ -53,3 +52,29 @@ def test(use_stream=True):
     print(s.read(128))
     s.close()
 main()
+=======
+print("main invocado")
+time.sleep(10)
+print("main en ejecucion.")
+try:
+	while(True):
+		print("while true")
+		wlan = wifimgr.get_connection()
+
+		if wlan is None:
+
+			print("Could not initialize the network connection.")
+
+		try:
+			print("Tomando muestra y publicando")
+			publishThingspeak.calculateAndPublish()
+			print("publicado")
+			time.sleep(10)
+			print("paso el tiempo.")
+
+		except:
+			wlan = wifimgr.get_connection()
+except:
+	print("Fallo el while True, Reintentando...")
+	main()
+>>>>>>> 010e7163d71a7731597647587e61601948276c2b
