@@ -1,4 +1,4 @@
-﻿Sistema de monitoreo para la impresora printmated 3D.
+﻿Sistema de supervision y apagado remoto para equipos de impresion 3D.
 ==========
 
 El monitoreo y control remoto de las impresoras 3D es fundamental para aumentar la calidad del producto finalizado,
@@ -8,27 +8,29 @@ Printmated3D y que proximamente se extendera para cualquier modelo de impresora 
 
 requisitos:
 --------------------
-+ Registrarse en el website o puedes implementar tu propio servidor thingspeak (https://github.com/miguel5612/thingspeak)
+1. [Estar registrado en on3D.com](wwww.onmotica.xyz) [o tener la pagina web en tu hosting local](https://github.com/miguel5612/on3D)
+2. [Tener el dispositivo de monitoreo instalado en tu impresora](#)
 
-Hardware:
+Hardware para ensamblar tu dispositivo de monitoreo:
 --------------------
 
-+ Node MCU 1.0 , Wemos o tarjeta compatible.
-+ Sensores de temperatura (..).
-+ 1 fuente DC-DC  3.3v - 5v.
-+ 1 adaptadores DC 12V.
+1. [Board ON3D](#).
+2. [Kit de termistores](#).
+3. [Fuente de poder 12V - 1A](#).
 
-Hardware para programar:
+Componentes del proyecto:
 --------------------
 
-+ Cable micro usb .
+1. [Sistema de administracion web para equipos 3D](onmotica.com)
+2. [Dispositivo de supervision y apagado remoto](github.com)
 
-
-Software:
+Micromodulos:
 --------------------
 
-+ Arduino ide (www.arduino.cc).
-+ Arduino board manager for ESP module --> https://github.com/esp8266/Arduino/releases/download/2.4.0-rc1/package_esp8266com_index.json
+1. [Firmware para el nodemcu](https://github.com/miguel5612/Node-mcu-v3.00-micropython-firmware)
+2. [Libreria para medir potencia](https://github.com/miguel5612/PZEM004T)
+3. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
+4. [Dispositivo de prueba - medidor de temperatura 24/7](https://github.com/miguel5612/OnMonitor_Web)
 
 Director de proyecto:
 --------------------
