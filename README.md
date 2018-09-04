@@ -32,6 +32,11 @@ Micromodulos:
 3. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
 4. [Dispositivo de prueba - medidor de temperatura 24/7](https://github.com/miguel5612/OnMonitor_Web)
 
+Documentacion:
+--------------------
++ Marlin FW para impresoras printmate3D --> https://github.com/miguel5612/Printmated-Marlin-FW
++ Servidor web para registrar los sistemas de supervision --> https://github.com/miguel5612/OnMonitor_Web
+
 Director de proyecto:
 --------------------
 
