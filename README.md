@@ -5,6 +5,10 @@ El monitoreo y control remoto de las impresoras 3D es fundamental para aumentar 
 Por esta razon para el año 2018 se propone como tesis el realizar este sistema aplicado y desarrollado sobre la impresora
 Printmated3D y que proximamente se extendera para cualquier modelo de impresora 3D.
 
+Library required:
+-------------------
+1. [Libreria del sistema de supervision - permite realizar la lectura de los sensores](https://github.com/miguel5612/3DSupervisionLib)
+2. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
 
 requisitos:
 --------------------
