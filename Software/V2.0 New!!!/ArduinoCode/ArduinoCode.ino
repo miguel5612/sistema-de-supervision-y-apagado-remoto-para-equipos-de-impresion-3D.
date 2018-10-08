@@ -46,6 +46,7 @@ void loop() {
   getTemp();
   getPower();
   //Print temperature in port serial  
+  requestEvent();
   delay(timeDelay); //wait 2000 mS for next measure
 }
 void requestEvent()
