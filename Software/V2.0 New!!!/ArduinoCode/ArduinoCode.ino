@@ -19,8 +19,13 @@ float i,v,p,e;
 #define MotorXTerm A4    // Thermistor Motor X (1)
 #define MotorYTerm A5    // Thermistor Motor Y (1)
 #define AmbientTerm A6   // Thermistor Base Ambient (1)
-#define timeDelay 100
+#define timeDelay 1000
 #define sep ','
+#define txMain 9 //Single pin for all Meters
+#define rx1 8 //Meter 1
+#define wRx 10
+#define wTx 11
+#define DebugBaudRate 115200
 
 thermistor HBT(HotBedTerm,0);     // 
 thermistor ET1(Extruder0Term,0);  // 
@@ -30,15 +35,16 @@ thermistor MX1(MotorXTerm,0);     //
 thermistor MY1(MotorYTerm,0);    // 
 thermistor AT(AmbientTerm,0);    // 
 
-PZEM004T pzem(&Serial1);
-IPAddress ip(192,168,1,1);
+PZEM004T pzem(rx1, txMain); // RX,TX
+IPAddress ip(192, 168, 1, 1);
+SoftwareSerial wemos(wRx,wTx);
+String lastData = "";
 
 void setup() {
   // put your setup code here, to run once: 
-  Serial.begin(9600); //initialize port serial at 9600 Bauds.
+  Serial.begin(DebugBaudRate); //initialize port serial at 9600 Bauds.
+  wemos.begin(DebugBaudRate);
   pzem.setAddress(ip);
-  Wire.begin(8);
-  Wire.onRequest(requestEvent); // register event
 }
 
 void loop() {
@@ -46,18 +52,18 @@ void loop() {
   getTemp();
   getPower();
   //Print temperature in port serial  
-  requestEvent();
+  sendData();
   delay(timeDelay); //wait 2000 mS for next measure
 }
-void requestEvent()
+void sendData()
 {
   outStr = getData();
-  Serial.print("DATA: ");
-  Serial.println(outStr);
-  int str_len = outStr.length() + 1;  
-  uint8_t Buffer[str_len];
-  outStr.toCharArray(Buffer, str_len);
-  Wire.write(Buffer,str_len);
+  if(outStr!=lastData){
+    Serial.print("DATA: ");
+    Serial.println(outStr);
+    wemos.println(outStr);
+    lastData =  outStr;
+  }
 }
 void getTemp(){
   temp1 = HBT.analog2temp(); // read temperature
@@ -75,5 +81,5 @@ void getPower(){
   e = pzem.energy(ip);
 }
 String getData(){
-  return String(temp1) + sep + String(temp2) + sep + String(temp3) + sep + String(temp4) + sep + String(temp5) + sep + String(temp6) + sep + String(temp7) + sep + String(v)1 + sep + String(i) + sep + String(p) + sep + String(e);
+  return (String(temp1) + sep + String(temp2) + sep + String(temp3) + sep + String(temp4) + sep + String(temp5) + sep + String(temp6) + sep + String(temp7) + sep + String(v) + sep + String(i) + sep + String(p) + sep + String(e));
 }
