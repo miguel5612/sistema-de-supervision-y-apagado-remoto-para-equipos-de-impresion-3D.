@@ -26,21 +26,28 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <SoftwareSerial.h>
+//needed for library
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>     
 
 // Update these with values suitable for your network.
 #define DebugBaudRate 115200
-#define RelayPin D8
 #define timeDelay 2000
 #define sep ','
 #define minDataIn -60157
 #define minDatalength 7 //bits
-const char* ssid = "MIGUELANGEL";
-const char* password = "administrador5612";
-const char* mqtt_server = "192.168.1.87";
+#define ledWifi D8
+#define RelayPin D7
+
+
+//Configuraciones del servidor MQTT
+const char* mqtt_server = "181.132.3.67";
 const char* outTopic = "pvdlab/1/printer1";
 const char* inTopic = "pvdlab/1/printer1Off";
+
 String Data = "";
-bool newData = false;
+bool newData = false, estado = false;
 long lastMsg = 0; 
 
 WiFiClient espClient;
@@ -49,33 +56,17 @@ SoftwareSerial arduinoSerial(D3, D2, false, 256);// SoftwareSerial arduinoSerial
 
 
 void setup() {
-  pinMode(RelayPin, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  pinMode(RelayPin, OUTPUT);
+  pinMode(ledWifi, OUTPUT);
+  digitalWrite(RelayPin,HIGH);
+  digitalWrite(ledWifi,LOW);
   Serial.begin(DebugBaudRate);
   arduinoSerial.begin(DebugBaudRate);
-  setup_wifi();
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("SSAR_3DPrinters");
+  digitalWrite(ledWifi,HIGH);
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
-}
-
-void setup_wifi() {
-
-  delay(10);
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
 }
 
 void getDataFromArduino(){
@@ -98,11 +89,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   // Switch on the LED if an 1 was received as first character
   if ((char)payload[0] == '1') {
-    digitalWrite(RelayPin, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is acive low on the ESP-01)
+    digitalWrite(RelayPin, LOW);  
   } else {
-    digitalWrite(RelayPin, HIGH);  // Turn the LED off by making the voltage HIGH
+    digitalWrite(RelayPin, HIGH); 
   }
 
 }
@@ -115,15 +104,20 @@ void reconnect() {
     if (client.connect("ESP8266Client")) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish(outTopic, "hello world");
+      client.publish(outTopic, "Testing SSAR");
       // ... and resubscribe
       client.subscribe(inTopic);
+      digitalWrite(ledWifi,HIGH);
     } else {
+      estado = !estado;
+      digitalWrite(ledWifi,estado);
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
+      estado = !estado;
+      digitalWrite(ledWifi,estado);
     }
   }
 }

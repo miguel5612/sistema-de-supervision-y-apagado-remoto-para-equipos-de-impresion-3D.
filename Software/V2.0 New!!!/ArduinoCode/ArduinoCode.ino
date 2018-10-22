@@ -81,5 +81,5 @@ void getPower(){
   e = pzem.energy(ip);
 }
 String getData(){
-  return (String(temp1) + sep + String(temp2) + sep + String(temp3) + sep + String(temp4) + sep + String(temp5) + sep + String(temp6) + sep + String(temp7) + sep + String(v) + sep + String(i) + sep + String(p) + sep + String(e));
+  return (String(temp1<=0?0:temp1) + sep + String(temp2<=0?0:temp2) + sep + String(temp3<=0?0:temp3) + sep + String(temp4<=0?0:temp4) + sep + String(temp5<=0?0:temp5) + sep + String(temp6<=0?0:temp6) + sep + String(temp7<=0?0:temp7) + sep + String(e<=0?0:e) + sep + String(v<=0?0:v) + sep + String(i<=0?0:i) + sep + String(p<=0?0:p));
 }
