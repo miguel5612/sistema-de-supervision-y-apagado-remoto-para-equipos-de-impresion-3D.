@@ -16,9 +16,8 @@ float i,v,p,e;
 #define Extruder0Term A1 // Thermistor Extruder
 #define MotorZTerm1 A2    // Thermistor Motor Z (1)
 #define MotorZTerm2 A3    // Thermistor Motor Z (2)
-#define MotorXTerm A4    // Thermistor Motor X (1)
-#define MotorYTerm A5    // Thermistor Motor Y (1)
-#define AmbientTerm A6   // Thermistor Base Ambient (1)
+#define MotorXTerm A6    // Thermistor Motor X (1)
+#define MotorYTerm A7    // Thermistor Motor Y (1)
 #define timeDelay 1000
 #define sep ','
 #define txMain 9 //Single pin for all Meters
@@ -33,7 +32,6 @@ thermistor MZ1(MotorZTerm1,0);    //
 thermistor MZ2(MotorZTerm2,0);    // 
 thermistor MX1(MotorXTerm,0);     // 
 thermistor MY1(MotorYTerm,0);    // 
-thermistor AT(AmbientTerm,0);    // 
 
 PZEM004T pzem(rx1, txMain); // RX,TX
 IPAddress ip(192, 168, 1, 1);
@@ -72,7 +70,6 @@ void getTemp(){
   temp4 = MZ2.analog2temp(); // read temperature
   temp5 = MX1.analog2temp(); // read temperature
   temp6 = MY1.analog2temp(); // read temperature
-  temp7 = AT.analog2temp(); // read temperature  
 }
 void getPower(){
   v =  pzem.voltage(ip);
@@ -81,5 +78,5 @@ void getPower(){
   e = pzem.energy(ip);
 }
 String getData(){
-  return (String(temp1<=0?0:temp1) + sep + String(temp2<=0?0:temp2) + sep + String(temp3<=0?0:temp3) + sep + String(temp4<=0?0:temp4) + sep + String(temp5<=0?0:temp5) + sep + String(temp6<=0?0:temp6) + sep + String(temp7<=0?0:temp7) + sep + String(e<=0?0:e) + sep + String(v<=0?0:v) + sep + String(i<=0?0:i) + sep + String(p<=0?0:p));
+  return (String(temp1<=0?0:temp1) + sep + String(temp2<=0?0:temp2) + sep + String(temp3<=0?0:temp3) + sep + String(temp4<=0?0:temp4) + sep + String(temp5<=0?0:temp5) + sep + String(temp7<=0?0:temp7)  + sep + String(v<=0?0:v) + sep + String(i<=0?0:i) + sep + String(p<=0?0:p) + sep + String(e<=0?0:e));
 }

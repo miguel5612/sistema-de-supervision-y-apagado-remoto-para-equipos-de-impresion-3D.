@@ -1,25 +1,7 @@
 /*
-  Basic ESP8266 MQTT example
+  Sistema de supervision y apagado remoto
 
-  This sketch demonstrates the capabilities of the pubsub library in combination
-  with the ESP8266 board/library.
-
-  It connects to an MQTT server then:
-  - publishes "hello world" to the topic "outTopic" every two seconds
-  - subscribes to the topic "inTopic", printing out any messages
-    it receives. NB - it assumes the received payloads are strings not binary
-  - If the first character of the topic "inTopic" is an 1, switch ON the ESP Led,
-    else switch it off
-
-  It will reconnect to the server if the connection is lost using a blocking
-  reconnect function. See the 'mqtt_reconnect_nonblocking' example for how to
-  achieve the same result without blocking the main loop.
-
-  To install the ESP8266 board, (using Arduino 1.6.4+):
-  - Add the following 3rd party board manager under "File -> Preferences -> Additional Boards Manager URLs":
-       http://arduino.esp8266.com/stable/package_esp8266com_index.json
-  - Open the "Tools -> Board -> Board Manager" and click install for the ESP8266"
-  - Select your ESP8266 in "Tools -> Board"
+  
 
 */
 #include <ArduinoJson.h>
@@ -41,6 +23,7 @@
 #define RelayPin D7
 
 
+
 //Configuraciones del servidor MQTT
 const char* mqtt_server = "68.183.31.237";
 const char* outTopic = "pvdlab/1/printer1";
@@ -49,6 +32,16 @@ const char* inTopic = "pvdlab/1/printer1Off";
 String Data = "";
 bool newData = false, estado = false;
 long lastMsg = 0; 
+
+//Parametros para validar la informacion recibida
+#define tempMin 0
+#define tempMax 300
+#define voltajeMin 0
+#define voltajeMax 250
+#define corrienteMin 0
+#define corrienteMax 10
+#define potenciaMin 0
+#define potenciaMax 10
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -176,7 +169,7 @@ void publishData(){
     root["D10"] = getValue(Data,sep,9);  
         
     root["RS"] = digitalRead(RelayPin);
-    char JSONmessageBuffer[128];
+    char JSONmessageBuffer[130];
     root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
     Serial.println("Sending message to MQTT topic..");
     Serial.println(JSONmessageBuffer);
@@ -199,13 +192,63 @@ void publishData(){
 }
 bool ValidateData(){
   bool validData = true;
-  bool eval = false;
-  for(int i=0;i<=9;i++){
-    eval = isValid(Data, sep, i);
-    if(!eval){Serial.print("Error in: ");Serial.print(i);Serial.print(";  ");}
-    validData = validData & eval;
-    delay(10);
+  bool eval = true;
+  float value = 0;
+  //Para las temperaturas
+  for(int i = 0; i<= 5; i++)
+  {
+    value = (getValue(Data,sep,i)); 
+    if(value>=tempMin && value<=tempMax)
+    {
+      eval = true & eval;
+    }
+    else
+    {
+      eval = false & eval;
+      Serial.print("La temperatura numero");
+      Serial.print(i);
+      Serial.print("esta errada, valor: ");
+      Serial.println(value);
+    }
   }
+  //Para el voltaje
+  value = (getValue(Data,sep,6)); 
+  if(value>=voltajeMin && value<=voltajeMax)
+  {
+    eval = true & eval;
+  }
+  else
+  {
+    eval = false & eval;
+    Serial.print("El voltaje esta errado, valor: ");
+    Serial.println(value);
+  }
+  //Para la corriente
+  value = (getValue(Data,sep,7)); 
+  if(value>=corrienteMin && value<=corrienteMax)
+  {
+    eval = true & eval;
+  }
+  else
+  {
+    eval = false & eval;
+    Serial.print("La corriente esta errada, valor: ");
+    Serial.println(value);
+  }
+  //Para la potencia
+  value = (getValue(Data,sep,8)); 
+  if(value>=potenciaMin && value<=potenciaMax)
+  {
+    eval = true & eval;
+  }
+  else
+  {
+    eval = false & eval;
+    Serial.print("La potencia esta errada, valor: ");
+    Serial.println(value);
+  }
+  validData = eval;
+  //Resultados    
   if(!validData){Serial.println();Serial.println("Validacion: error");Serial.print("Failed lecture: ");Serial.println(Data);return false;}
   else{Serial.print("Publish message: "); Serial.println(Data);return true;}
 }
@@ -225,20 +268,5 @@ float getValue(String data, char separator, int index)
         }
     }
     String temporalS = found > index ? (data.substring(strIndex[0], strIndex[1])) : "0";
-    return (temporalS.toFloat());
+    return (round(temporalS.toFloat()*10)/10);
 }
-bool isValid(String data, char separator, int index)
-{
-    int found = 0;
-    int strIndex[] = { 0, -1 };
-    int maxIndex = data.length();
-
-    for (int i = 0; i <= maxIndex && found <= index; i++) {
-        if (data.charAt(i) == separator || i == maxIndex) {
-            found++;
-            strIndex[0] = strIndex[1] + 1;
-            strIndex[1] = (i == maxIndex) ? i+1 : i;
-        }        
-    }
-    return found > index ? data.substring(strIndex[0], strIndex[1]).toInt()>=minDataIn : false;
-}  // END
