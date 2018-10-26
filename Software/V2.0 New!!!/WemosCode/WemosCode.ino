@@ -22,7 +22,7 @@
   - Select your ESP8266 in "Tools -> Board"
 
 */
-
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <SoftwareSerial.h>
@@ -33,7 +33,7 @@
 
 // Update these with values suitable for your network.
 #define DebugBaudRate 115200
-#define timeDelay 2000
+#define timeDelay 4000
 #define sep ','
 #define minDataIn -60157
 #define minDatalength 7 //bits
@@ -42,7 +42,7 @@
 
 
 //Configuraciones del servidor MQTT
-const char* mqtt_server = "181.132.3.67";
+const char* mqtt_server = "68.183.31.237";
 const char* outTopic = "pvdlab/1/printer1";
 const char* inTopic = "pvdlab/1/printer1Off";
 
@@ -128,28 +128,80 @@ void loop() {
     reconnect();
   }
   client.loop();
-  getDataFromArduino();
-  publishData();
+  long now = millis();
+  if (now - lastMsg > timeDelay & newData)
+  {
+    lastMsg = now;
+    if(ValidateData()){        
+      if(Data.length()>=minDatalength) {
+        publishData();
+      }
+    }  
+  }
+  else
+  {
+    getDataFromArduino();
+  }
+  
   
 }
+
 void publishData(){
-  long now = millis();
-  if (now - lastMsg > timeDelay & newData & Data.length()>=minDatalength) {
-    lastMsg = now;
-    if(ValidateAndShowData()){
-        char msg[Data.length()];
-        Data.toCharArray(msg,Data.length());
-        client.publish(outTopic, msg);
-        newData = false;
-        Data = "";
-      }
+    // Memory pool for JSON object tree.
+    //
+    // Inside the brackets, 200 is the size of the pool in bytes.
+    // Don't forget to change this value to match your JSON document.
+    // Use arduinojson.org/assistant to compute the capacity.
+    StaticJsonBuffer<200> jsonBuffer;
+    // StaticJsonBuffer allocates memory on the stack, it can be
+    // replaced by DynamicJsonBuffer which allocates in the heap.
+    //
+    // DynamicJsonBuffer  jsonBuffer(200);
+    
+    // Create the root of the object tree.
+    //
+    // It's a reference to the JsonObject, the actual bytes are inside the
+    // JsonBuffer with all the other nodes of the object tree.
+    // Memory is freed when jsonBuffer goes out of scope.
+    JsonObject& root = jsonBuffer.createObject();         
+    root["D1"] = getValue(Data,sep,0);  
+    root["D2"] = getValue(Data,sep,1); 
+    root["D3"] = getValue(Data,sep,2);  
+    root["D4"] = getValue(Data,sep,3);  
+    root["D5"] = getValue(Data,sep,4);  
+    root["D6"] = getValue(Data,sep,5); 
+    root["D7"] = getValue(Data,sep,6);  
+    root["D8"] = getValue(Data,sep,7);  
+    root["D9"] = getValue(Data,sep,8);  
+    root["D10"] = getValue(Data,sep,9);  
+        
+    root["RS"] = digitalRead(RelayPin);
+    char JSONmessageBuffer[128];
+    root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+    Serial.println("Sending message to MQTT topic..");
+    Serial.println(JSONmessageBuffer);
+    
+    if (client.publish(outTopic, JSONmessageBuffer) == true) {
+      Serial.println("Success sending message");
+    } else {
+      Serial.println("Error sending message");
     }
+    /*
+    root.printTo(Data); //Almaceno el json generado en la variable Data
+      Serial.print("El json es: "); Serial.println(Data);
+      char msg[Data.length()];
+      Data.toCharArray(msg,Data.length());
+      
+      client.publish(outTopic, msg);
+      */
+      newData = false;
+      Data = "";
 }
-bool ValidateAndShowData(){
+bool ValidateData(){
   bool validData = true;
   bool eval = false;
   for(int i=0;i<=9;i++){
-    eval = getValue(Data, sep, i);
+    eval = isValid(Data, sep, i);
     if(!eval){Serial.print("Error in: ");Serial.print(i);Serial.print(";  ");}
     validData = validData & eval;
     delay(10);
@@ -157,7 +209,24 @@ bool ValidateAndShowData(){
   if(!validData){Serial.println();Serial.println("Validacion: error");Serial.print("Failed lecture: ");Serial.println(Data);return false;}
   else{Serial.print("Publish message: "); Serial.println(Data);return true;}
 }
-bool getValue(String data, char separator, int index)
+
+double getValue(String data, char separator, int index)
+{
+
+    int found = 0;
+    int strIndex[] = { 0, -1 };
+    int maxIndex = data.length();
+
+    for (int i = 0; i <= maxIndex && found <= index; i++) {
+        if (data.charAt(i) == separator || i == maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1] + 1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
+    }
+    return found > index ? (data.substring(strIndex[0], strIndex[1])).toInt () : 0;
+}
+bool isValid(String data, char separator, int index)
 {
     int found = 0;
     int strIndex[] = { 0, -1 };
