@@ -210,7 +210,7 @@ bool ValidateData(){
   else{Serial.print("Publish message: "); Serial.println(Data);return true;}
 }
 
-double getValue(String data, char separator, int index)
+float getValue(String data, char separator, int index)
 {
 
     int found = 0;
@@ -224,7 +224,8 @@ double getValue(String data, char separator, int index)
             strIndex[1] = (i == maxIndex) ? i+1 : i;
         }
     }
-    return found > index ? (data.substring(strIndex[0], strIndex[1])).toInt () : 0;
+    String temporalS = found > index ? (data.substring(strIndex[0], strIndex[1])) : "0";
+    return (temporalS.toFloat());
 }
 bool isValid(String data, char separator, int index)
 {
@@ -237,7 +238,7 @@ bool isValid(String data, char separator, int index)
             found++;
             strIndex[0] = strIndex[1] + 1;
             strIndex[1] = (i == maxIndex) ? i+1 : i;
-        }
+        }        
     }
     return found > index ? data.substring(strIndex[0], strIndex[1]).toInt()>=minDataIn : false;
 }  // END
