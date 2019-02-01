@@ -15,12 +15,12 @@
 
 // Update these with values suitable for your network.
 #define DebugBaudRate 115200
-#define timeDelay 4000
+#define timeDelay 2000
 #define sep ','
 #define minDataIn -60157
 #define minDatalength 7 //bits
 #define ledWifi D8
-#define RelayPin D7
+#define RelayPin D1
 
 
 
@@ -30,18 +30,18 @@ const char* outTopic = "pvdlab/1/printer1";
 const char* inTopic = "pvdlab/1/printer1Off";
 
 String Data = "";
-bool newData = false, estado = false;
+bool newData = false, estado = false, firstMessage = false;
 long lastMsg = 0; 
 
 //Parametros para validar la informacion recibida
 #define tempMin 0
 #define tempMax 300
 #define voltajeMin 0
-#define voltajeMax 250
+#define voltajeMax 2500
 #define corrienteMin 0
-#define corrienteMax 10
+#define corrienteMax 100
 #define potenciaMin 0
-#define potenciaMax 10
+#define potenciaMax 1000
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -127,7 +127,16 @@ void loop() {
     lastMsg = now;
     if(ValidateData()){        
       if(Data.length()>=minDatalength) {
-        publishData();
+        if(firstMessage)
+        {
+          getDataFromArduino();   
+          firstMessage = false;   
+        }
+        else
+        {
+          publishData();
+          firstMessage = true;
+        }
       }
     }  
   }
@@ -246,6 +255,10 @@ bool ValidateData(){
     eval = false & eval;
     Serial.print("La potencia esta errada, valor: ");
     Serial.println(value);
+  }
+  if(Data.length() < 6)
+  {
+    eval = eval & false; //If data distinct of 0,0,0,0,0,0,0,0,0,0
   }
   validData = eval;
   //Resultados    

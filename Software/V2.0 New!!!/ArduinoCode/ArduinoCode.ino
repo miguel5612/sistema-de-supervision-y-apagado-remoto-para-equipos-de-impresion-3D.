@@ -18,12 +18,12 @@ float i,v,p,e;
 #define MotorZTerm2 A3    // Thermistor Motor Z (2)
 #define MotorXTerm A6    // Thermistor Motor X (1)
 #define MotorYTerm A7    // Thermistor Motor Y (1)
-#define timeDelay 1000
+#define timeDelay 500
 #define sep ','
 #define txMain 9 //Single pin for all Meters
 #define rx1 8 //Meter 1
-#define wRx 10
-#define wTx 11
+#define wRx 7
+#define wTx 6
 #define DebugBaudRate 115200
 
 thermistor HBT(HotBedTerm,0);     // 
@@ -70,6 +70,24 @@ void getTemp(){
   temp4 = MZ2.analog2temp(); // read temperature
   temp5 = MX1.analog2temp(); // read temperature
   temp6 = MY1.analog2temp(); // read temperature
+  if(temp1<=0 || temp1>300){
+    temp1 = 0;
+  }
+  if(temp2<=0 || temp2>300){
+    temp2 = 0;
+  }
+  if(temp3<=0 || temp3>300){
+    temp3 = 0;
+  }
+  if(temp4<=0 || temp4>300){
+    temp4 = 0;
+  }
+  if(temp5<=0 || temp5>300){
+    temp5 = 0;
+  }
+  if(temp6<=0 || temp6>300){
+    temp6 = 0;
+  }
 }
 void getPower(){
   v =  pzem.voltage(ip);
