@@ -33,7 +33,7 @@ thermistor MZ2(MotorZTerm2,0);    //
 thermistor MX1(MotorXTerm,0);     // 
 thermistor MY1(MotorYTerm,0);    // 
 
-PZEM004T pzem(rx1, txMain); // RX,TX
+PZEM004T pzem(txMain, rx1); // RX,TX
 IPAddress ip(192, 168, 1, 1);
 SoftwareSerial wemos(wRx,wTx);
 String lastData = "";
