@@ -1,76 +1,51 @@
-/*
-  Sistema de supervision y apagado remoto
-
-  
-
-*/
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+
 #include <SoftwareSerial.h>
-//needed for library
-#include <DNSServer.h>
-#include <ESP8266WebServer.h>
-#include <WiFiManager.h>     
-
-// Update these with values suitable for your network.
 #define DebugBaudRate 115200
-#define timeDelay 2000
-#define sep ','
-#define minDataIn -60157
-#define minDatalength 7 //bits
-#define ledWifi D8
-#define RelayPin D1
 
-
-
-//Configuraciones del servidor MQTT
-const char* mqtt_server = "68.183.31.237";
-const char* outTopic = "pvdlab/1/printer1";
-const char* inTopic = "pvdlab/1/printer1Off";
-
+const int relayPin = D1;
+const char* ssid = "MIGUELANGEL";
+const char* password = "administrador5612";
+const char* mqtt_server = "test.mosquitto.org";
+const char* outTopic = "/PVDLab/bogohackI3B/IN";
 String Data = "";
-bool newData = false, estado = false, firstMessage = false;
-long lastMsg = 0; 
 
-//Parametros para validar la informacion recibida
-#define tempMin 0
-#define tempMax 300
-#define voltajeMin 0
-#define voltajeMax 2500
-#define corrienteMin 0
-#define corrienteMax 100
-#define potenciaMin 0
-#define potenciaMax 1000
+long lastMsg = 0;
+char msg[50];
+int value = 0;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 SoftwareSerial arduinoSerial(D3, D2, false, 256);// SoftwareSerial arduinoSerial(14, 12, false, 256);
 
 
-void setup() {
-  pinMode(RelayPin, OUTPUT);
-  pinMode(ledWifi, OUTPUT);
-  digitalWrite(RelayPin,HIGH);
-  digitalWrite(ledWifi,LOW);
-  Serial.begin(DebugBaudRate);
-  arduinoSerial.begin(DebugBaudRate);
-  WiFiManager wifiManager;
-  wifiManager.autoConnect("SSAR_3DPrinters");
-  digitalWrite(ledWifi,HIGH);
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+void setup_wifi() {
+
+  delay(10);
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  randomSeed(micros());
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, HIGH);
 }
 
-void getDataFromArduino(){
-  while (arduinoSerial.available() > 0) {
-    char inByte = arduinoSerial.read();
-    Data += inByte;
-    //Serial.write(inByte);
-    newData = true; 
-    yield();
-  }
-}
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -82,9 +57,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   // Switch on the LED if an 1 was received as first character
   if ((char)payload[0] == '1') {
-    digitalWrite(RelayPin, LOW);  
+    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
+    // but actually the LED is on; this is because
+    // it is active low on the ESP-01)
   } else {
-    digitalWrite(RelayPin, HIGH); 
+    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
   }
 
 }
@@ -93,68 +70,63 @@ void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
+    // Create a random client ID
+    String clientId = "ESP8266Client-";
+    clientId += String(random(0xffff), HEX);
     // Attempt to connect
-    if (client.connect("ESP8266Client")) {
+    if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish(outTopic, "Testing SSAR");
+      client.publish("outTopic", "hello world");
       // ... and resubscribe
-      client.subscribe(inTopic);
-      digitalWrite(ledWifi,HIGH);
+      client.subscribe("inTopic");
     } else {
-      estado = !estado;
-      digitalWrite(ledWifi,estado);
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
-      estado = !estado;
-      digitalWrite(ledWifi,estado);
     }
   }
 }
 
+void setup() {
+  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  Serial.begin(DebugBaudRate);
+  arduinoSerial.begin(DebugBaudRate);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+}
+
 void loop() {
 
+  digitalWrite(relayPin, HIGH);
   if (!client.connected()) {
     reconnect();
   }
   client.loop();
+  if(Data!="") getDataFromArduino();
+  
   long now = millis();
-  if (now - lastMsg > timeDelay & newData)
-  {
+  if (now - lastMsg > 2000) {
     lastMsg = now;
-    if(ValidateData()){        
-      if(Data.length()>=minDatalength) {
-        if(firstMessage)
-        {
-          getDataFromArduino();   
-          firstMessage = false;   
-        }
-        else
-        {
-          publishData();
-          firstMessage = true;
-        }
-      }
-    }  
+    publishDataTest();
+    digitalWrite(relayPin, LOW);
+    Serial.println("Relay");
+    Serial.print("Data: ");Serial.println(Data);
+    delay(500);
   }
-  else
-  {
-    getDataFromArduino();
-  }
-  
-  
 }
 
-void publishData(){
+
+void publishDataTest(){
     // Memory pool for JSON object tree.
     //
     // Inside the brackets, 200 is the size of the pool in bytes.
     // Don't forget to change this value to match your JSON document.
     // Use arduinojson.org/assistant to compute the capacity.
-    StaticJsonBuffer<200> jsonBuffer;
+    StaticJsonBuffer<400> jsonBuffer;
     // StaticJsonBuffer allocates memory on the stack, it can be
     // replaced by DynamicJsonBuffer which allocates in the heap.
     //
@@ -166,19 +138,24 @@ void publishData(){
     // JsonBuffer with all the other nodes of the object tree.
     // Memory is freed when jsonBuffer goes out of scope.
     JsonObject& root = jsonBuffer.createObject();         
-    root["D1"] = getValue(Data,sep,0);  
-    root["D2"] = getValue(Data,sep,1); 
-    root["D3"] = getValue(Data,sep,2);  
-    root["D4"] = getValue(Data,sep,3);  
-    root["D5"] = getValue(Data,sep,4);  
-    root["D6"] = getValue(Data,sep,5); 
-    root["D7"] = getValue(Data,sep,6);  
-    root["D8"] = getValue(Data,sep,7);  
-    root["D9"] = getValue(Data,sep,8);  
-    root["D10"] = getValue(Data,sep,9);  
-        
-    root["RS"] = digitalRead(RelayPin);
-    char JSONmessageBuffer[130];
+    root["D1"] = random(1,10);  
+    root["D2"] = random(1,10); 
+    root["D3"] = random(1,10);  
+    root["D4"] = random(1,10);  
+    root["D5"] = random(1,10);  
+    root["D6"] = random(1,10); 
+    root["D7"] = random(1,10);  
+    root["D8"] = random(1,10);  
+    root["D9"] = random(1,10);  
+    root["D10"] = random(1,10);  
+    root["D11"] = random(1,10);  
+    root["D12"] = random(1,10);  
+    root["D13"] = random(1,10);  
+    root["D14"] = random(1,10);  
+    root["D15"] = random(1,10);  
+
+    root["status"] = digitalRead(2);
+    char JSONmessageBuffer[400];
     root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
     Serial.println("Sending message to MQTT topic..");
     Serial.println(JSONmessageBuffer);
@@ -188,98 +165,13 @@ void publishData(){
     } else {
       Serial.println("Error sending message");
     }
-    /*
-    root.printTo(Data); //Almaceno el json generado en la variable Data
-      Serial.print("El json es: "); Serial.println(Data);
-      char msg[Data.length()];
-      Data.toCharArray(msg,Data.length());
-      
-      client.publish(outTopic, msg);
-      */
-      newData = false;
-      Data = "";
-}
-bool ValidateData(){
-  bool validData = true;
-  bool eval = true;
-  float value = 0;
-  //Para las temperaturas
-  for(int i = 0; i<= 5; i++)
-  {
-    value = (getValue(Data,sep,i)); 
-    if(value>=tempMin && value<=tempMax)
-    {
-      eval = true & eval;
-    }
-    else
-    {
-      eval = false & eval;
-      Serial.print("La temperatura numero");
-      Serial.print(i);
-      Serial.print("esta errada, valor: ");
-      Serial.println(value);
-    }
-  }
-  //Para el voltaje
-  value = (getValue(Data,sep,6)); 
-  if(value>=voltajeMin && value<=voltajeMax)
-  {
-    eval = true & eval;
-  }
-  else
-  {
-    eval = false & eval;
-    Serial.print("El voltaje esta errado, valor: ");
-    Serial.println(value);
-  }
-  //Para la corriente
-  value = (getValue(Data,sep,7)); 
-  if(value>=corrienteMin && value<=corrienteMax)
-  {
-    eval = true & eval;
-  }
-  else
-  {
-    eval = false & eval;
-    Serial.print("La corriente esta errada, valor: ");
-    Serial.println(value);
-  }
-  //Para la potencia
-  value = (getValue(Data,sep,8)); 
-  if(value>=potenciaMin && value<=potenciaMax)
-  {
-    eval = true & eval;
-  }
-  else
-  {
-    eval = false & eval;
-    Serial.print("La potencia esta errada, valor: ");
-    Serial.println(value);
-  }
-  if(Data.length() < 6)
-  {
-    eval = eval & false; //If data distinct of 0,0,0,0,0,0,0,0,0,0
-  }
-  validData = eval;
-  //Resultados    
-  if(!validData){Serial.println();Serial.println("Validacion: error");Serial.print("Failed lecture: ");Serial.println(Data);return false;}
-  else{Serial.print("Publish message: "); Serial.println(Data);return true;}
 }
 
-float getValue(String data, char separator, int index)
-{
-
-    int found = 0;
-    int strIndex[] = { 0, -1 };
-    int maxIndex = data.length();
-
-    for (int i = 0; i <= maxIndex && found <= index; i++) {
-        if (data.charAt(i) == separator || i == maxIndex) {
-            found++;
-            strIndex[0] = strIndex[1] + 1;
-            strIndex[1] = (i == maxIndex) ? i+1 : i;
-        }
-    }
-    String temporalS = found > index ? (data.substring(strIndex[0], strIndex[1])) : "0";
-    return (round(temporalS.toFloat()*10)/10);
+void getDataFromArduino(){
+  while (arduinoSerial.available() > 0) {
+    char inByte = arduinoSerial.read();
+    Data += inByte;
+    //Serial.write(inByte);
+    yield();
+  }
 }
