@@ -106,7 +106,7 @@ void loop() {
     reconnect();
   }
   client.loop();
-  if(Data!="") getDataFromArduino();
+  if(Data="") getDataFromArduino();
   
   long now = millis();
   if (now - lastMsg > 2000) {
@@ -154,7 +154,7 @@ void publishDataTest(){
     root["D14"] = random(1,10);  
     root["D15"] = random(1,10);  
 
-    root["status"] = digitalRead(2);
+    root["status"] = digitalRead(relayPin);
     char JSONmessageBuffer[400];
     root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
     Serial.println("Sending message to MQTT topic..");
