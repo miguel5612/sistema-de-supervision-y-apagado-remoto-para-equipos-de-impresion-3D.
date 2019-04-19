@@ -1,1 +1,0 @@
-https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation

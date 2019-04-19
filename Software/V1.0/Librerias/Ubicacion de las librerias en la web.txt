@@ -1,2 +1,0 @@
-https://github.com/tzapu/WiFiManager
-https://github.com/olehs/PZEM004T --> ISUE LICENCE
