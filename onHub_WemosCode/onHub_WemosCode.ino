@@ -70,7 +70,7 @@ void loop() {
     if(procesamiento.procesarData(Data))
     {
       jsonIndex = procesamiento.getIndex();
-      if(serDebug) Serial.println("Subiendo al sistema  " + String(jsonIndex) + "Mediciones individuales");
+      if(serDebug) Serial.println("Subiendo al sistema  " + String(jsonIndex) + " Mediciones individuales");
       for(int i = 1; i<= jsonIndex; i++)
       {
         publishData(procesamiento.getJson(i));

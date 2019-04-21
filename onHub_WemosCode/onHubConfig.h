@@ -24,6 +24,6 @@
 
 #define minDelay 10
 #define relayEEPROMAdressState 0
-#define deltaLimite 2 //2 grados de diferencia
+#define deltaLimite 6 //6 grados de diferencia
 
 #endif // onHubConfig.h
