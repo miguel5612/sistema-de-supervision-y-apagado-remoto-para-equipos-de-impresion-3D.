@@ -187,7 +187,7 @@ boolean PROCESS_DATA::procesarData(String Data)
       String reporteEstado2 = (__jsonIndex < 60)?"menor":"mayor";
       Serial.println("***jsonIndex vs 60 " + reporteEstado2 + "   ***");
       reporteEstado2 = (__segundos < __tiempoEspera)?"menor":"mayor";
-      Serial.println("***segundos vs tiempo de espera " + reporteEstado2 + "   ***");
+      Serial.println("***segundos(" +  String(__segundos) + ") vs tiempo de espera(" + String(__tiempoEspera) + ") " + reporteEstado2 + "   ***");
       
       __lastPublished = millis();
       return true;
@@ -211,7 +211,7 @@ String PROCESS_DATA::getJson(int index){
 
 void PROCESS_DATA::setTimeToWait(int tiempo)
 {
-  __segundos = tiempo;
+  __tiempoEspera = tiempo;
   if(serDebug) Serial.println("Tiempo de espera para publicar(minutos): " + String(tiempo));
 }
 
