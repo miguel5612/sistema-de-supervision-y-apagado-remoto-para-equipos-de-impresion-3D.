@@ -217,7 +217,7 @@ void PROCESS_DATA::setTimeToWait(int tiempo)
 
 int PROCESS_DATA::generateRandom()
 {
-  return random(30,300);
+  return random(30,400);
 }
 
 
