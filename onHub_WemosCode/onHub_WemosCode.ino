@@ -24,7 +24,7 @@ String Data = "";
 int jsonIndex = 1, tiempoEspera;
 
 static const int count_mqtt_server = 3;
-static char* mqtt_server[count_mqtt_server] = { "157.230.174.83", "test.mosquitto.org", "157.230.174.83"};
+static char* mqtt_server[count_mqtt_server] = { "mqtt3.onmotica.com", "mqtt2.onmotica.com", "mqtt.onmotica.com"};
 char* __mqttServerConnected;
 const int serverPort = 1883;
 int serverConnectedIndex = 0;
@@ -81,6 +81,7 @@ void loop() {
       if(serDebug) Serial.println("Nuevo tiempo de espera: " + String(tiempoEspera) + " Segundos");
     }
   }
+  mqttClient.loop();
 }
 
 //Funciones MQTT
@@ -95,7 +96,7 @@ bool publishData(String strJson){
       strJson.toCharArray(Json, 260);
       if(serDebug) Serial.println("Publicando (" + String(__mqttServerConnected) + ") mensaje al topic " +  String(outTopic) + "  Json: " + String(Json));
       
-      if (mqttClient.publish(outTopic, Json) == true) {
+      if (mqttClient.publish(inTopic, Json) == true) {
         return 1;
       } else {
         return 0;
@@ -143,7 +144,7 @@ void reconnect() {
       // Once connected, publish an announcement...
       mqttClient.publish("testMQTT", "probando sistema de supervision");
       // ... and resubscribe
-      mqttClient.subscribe(inTopic);
+      mqttClient.subscribe(outTopic);
     } else {
       if(serDebug) Serial.print("fallo, rc=");
       if(serDebug) Serial.print(mqttClient.state());
@@ -155,11 +156,17 @@ void reconnect() {
   }
 }
 void callback(char* topic, byte* payload, unsigned int length) {
-  if(topic == inTopic)
+  if(serDebug) Serial.print("Message arrived ");
+  if(serDebug) Serial.println(topic);
+  if(serDebug) Serial.println(outTopic);
+  String strTopic = String(topic);
+  String strOutTopic = String(outTopic);
+  strOutTopic.trim();
+  strTopic.trim();
+  if(serDebug) Serial.println(strTopic.indexOf(strOutTopic));
+  if(strTopic.indexOf(strOutTopic) > 0 || strTopic == strOutTopic)
   {
     String mensaje = "";
-    if(serDebug) Serial.println("Message arrived [");
-    if(serDebug) Serial.println(topic);
     if(serDebug) Serial.println("] ");
     for (int i = 0; i < length; i++) {
             if(serDebug) Serial.print((char)payload[i]);  
@@ -167,15 +174,35 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
    bool state = false;
-   if(mensaje.indexOf("ON") > 0) state = true;
-   if(mensaje.indexOf("on") > 0) state = true;
-   if(mensaje.indexOf("encender") > 0) state = true;            
-   if(mensaje.indexOf("prender") > 0) state = true;            
+   
+   mensaje.trim();
+   if(mensaje.indexOf("ON") > 0 || mensaje == "ON") state = true;
+   if(mensaje.indexOf("on") > 0 || mensaje == "on") state = true;
+   if(mensaje.indexOf("1") > 0 || mensaje == "1") state = true;
+   if(mensaje.indexOf("encender") > 0 || mensaje == "encender") state = true;            
+   if(mensaje.indexOf("prender") > 0 || mensaje == "prender") state = true;            
+   
+   if(mensaje.indexOf("0") > 0 || mensaje == "0") state = false;
+   if(mensaje.indexOf("OFF") > 0 || mensaje == "OFF") state = false;
+   if(mensaje.indexOf("off") > 0 || mensaje == "off") state = false;
+   if(mensaje.indexOf("apagar") > 0 || mensaje == "apagar") state = false;
+   if(mensaje.indexOf("APAGAR") > 0 || mensaje == "APAGAR") state = false;
+   
    if(serDebug) Serial.println("");
    if(serDebug) Serial.println("Nuevo estado del rele -- " + String(state));
-   
-   EEPROM.write(relayEEPROMAdressState, state);  
-            
+
+   procesamiento.setTimeToWait(1); //Para que publique de inmediato lo que tenga...
+
+   if(mensaje != "actualizar")
+   {
+     codigoComun.escribirSalidaDigital(relayPin, state);
+     EEPROM.write(relayEEPROMAdressState, state);  
+     procesamiento.updateRelay(state);
+   }
+   else
+   {
+    if(serDebug) Serial.println("Enviando actualizacion de estado");
+   }
   }
 }
 String obtenerIdCliente()

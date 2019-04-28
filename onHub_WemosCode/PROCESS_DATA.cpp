@@ -171,7 +171,7 @@ boolean PROCESS_DATA::procesarData(String Data)
     __Json = assemblyJson(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, state);
     __segundos =  (millis() - __lastPublished)/1000;
 
-    if(serDebug) Serial.println("Guardando JSON(" + String(__jsonIndex) + "): " + __Json);
+    if(serDebug) Serial.println("Guardando JSON(" + String(__jsonIndex) + "): " + __Json + " , segundos transcurridos: " +  String(__segundos));
       
     __jsonArray[__jsonIndex] = __Json;
     __jsonIndex =  __jsonIndex + 1;
@@ -194,6 +194,10 @@ boolean PROCESS_DATA::procesarData(String Data)
     }
     
 }
+void PROCESS_DATA::updateRelay(bool stateRelay)
+{
+  __jsonArray[__jsonIndex]  = assemblyJson(__data1, __data2, __data3, __data4, __data5, __data6, __data7, __data8, __data9, __data10, __data11, __data12, __data13,__data14, __data15, stateRelay);
+}
 
 void PROCESS_DATA::resetIndex()
 {
@@ -212,7 +216,7 @@ String PROCESS_DATA::getJson(int index){
 void PROCESS_DATA::setTimeToWait(int tiempo)
 {
   __tiempoEspera = tiempo;
-  if(serDebug) Serial.println("Tiempo de espera para publicar(minutos): " + String(tiempo));
+  if(serDebug) Serial.println("Tiempo de espera para publicar(segundos): " + String(tiempo));
 }
 
 int PROCESS_DATA::generateRandom()
