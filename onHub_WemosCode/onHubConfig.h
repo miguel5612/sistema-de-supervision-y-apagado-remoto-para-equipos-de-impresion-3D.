@@ -23,7 +23,9 @@
 #define arduinoRXPin D2
 
 #define minDelay 10
-#define relayEEPROMAdressState 0
+#define relayEEPROMAdressState 125 // Max 512, value between 0-512
+//#define MQTT_MAX_PACKET_SIZE 200 //modify this into pub-sub client library
+#define maxLen 300 //the maximum message size, including header, is 128 bytes by default.
 #define deltaLimite 6 //6 grados de diferencia
 
 #endif // onHubConfig.h

@@ -7,7 +7,8 @@ class SERIAL_COMMUNICATION {
   public:
     void inicializar();
     String leerArduino();
-    boolean compararUltimaLectura();
+    boolean compararUltimaLectura();    
+    String getValue(String data, char separator, int index);
 };
 
 

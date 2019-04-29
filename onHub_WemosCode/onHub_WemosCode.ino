@@ -32,9 +32,12 @@ int serverConnectedIndex = 0;
 unsigned long lastPublished = 0;
 unsigned long lastGetPetition = 0;
 
+String test = "";
 
 void setup() {
 
+  EEPROM.begin(512);
+  
   codigoComun.inicializarSalida(wifiPin);
   codigoComun.inicializarSalida(relayPin);
   codigoComun.inicializarSalida(LED_BUILTIN);
@@ -57,18 +60,20 @@ void setup() {
   procesamiento.inicializar();
   
   //Test
-  String JSON = procesamiento.makeTest();
-  Serial.println("Test: " + String(JSON));
+  test = procesamiento.makeTest();
+  Serial.println("Test: " + String(test));
 }
 
 void loop() {
 
   if(!WiFiProcess.wifiIsConnected()) setup(); //Reinicio si no hay wifi
   if (!mqttIsConnected()) reconnect(); //Reconectar mqtt si perdio conexion  
+  mqttClient.loop();
   if(Data = "") Data = serial.leerArduino();
   if(Data != "")  {
     if(procesamiento.procesarData(Data))
     {
+      int attemps = 0;
       jsonIndex = procesamiento.getIndex();
       if(serDebug) Serial.println("Subiendo al sistema  " + String(jsonIndex) + " Mediciones individuales");
       for(int i = 1; i<= jsonIndex; i++)
@@ -81,31 +86,41 @@ void loop() {
       if(serDebug) Serial.println("Nuevo tiempo de espera: " + String(tiempoEspera) + " Segundos");
     }
   }
-  mqttClient.loop();
+  
 }
 
 //Funciones MQTT
 
 bool publishData(String strJson){
 
-    int len = 260;
+    int len = maxLen;
     char Json[len];
 
     if(strJson != "")
     {
-      strJson.toCharArray(Json, 260);
-      if(serDebug) Serial.println("Publicando (" + String(__mqttServerConnected) + ") mensaje al topic " +  String(outTopic) + "  Json: " + String(Json));
-      
-      if (mqttClient.publish(inTopic, Json) == true) {
-        return 1;
-      } else {
-        return 0;
+      strJson.toCharArray(Json, len);
+      delay(1);
+      int attemps = 0;
+      while(mqttClient.publish((char*) inTopic,(char*) Json) == false & attemps<5)
+      {        
+        mqttClient.publish((char*) inTopic , Json);
+        if(serDebug) Serial.println("intento: " + String(attemps) + ",Publicando (" + String(__mqttServerConnected) + ") mensaje al topic " +  String(outTopic) + "  Json: " + String(Json));
+        delay(minDelay*attemps);
+        if (!mqttIsConnected()) reconnect(); //Reconectar mqtt si perdio conexion  
+        attemps ++;
       }
-      return 0;
+      if(attemps == 5)
+      {
+        return false;  
+      }
+      else
+      {
+        return true;  
+      }
     }
     else
     {
-      return 0; //json vacio
+      return false; //json vacio
     }
 }
 
@@ -197,6 +212,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
    {
      codigoComun.escribirSalidaDigital(relayPin, state);
      EEPROM.write(relayEEPROMAdressState, state);  
+     EEPROM.commit();
      procesamiento.updateRelay(state);
    }
    else

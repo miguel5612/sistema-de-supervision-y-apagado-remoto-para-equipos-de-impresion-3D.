@@ -19,15 +19,17 @@ String PROCESS_DATA::getTime()
       time_t now = time(nullptr);
       struct tm* p_tm = localtime(&now);
       __fecha = String(p_tm->tm_mday) + "/" +  String(p_tm->tm_mon + 1) + "/" + String(p_tm->tm_year + 1900) + " - " +  String(p_tm->tm_hour) + ":" + String(p_tm->tm_min) + ":" + String(p_tm->tm_sec);
+      if(serDebug & __fecha == "") Serial.println("Error obteniendo la fecha");
+      else if(serDebug) Serial.println("Fecha: " + __fecha);
       return __fecha;
 }
-String PROCESS_DATA::assemblyJson(int value1, int value2, int value3, int value4, int value5, int value6, int value7, int value8, int value9, int value10, int value11, int value12, int value13, int value14, int value15, bool estado){
+String PROCESS_DATA::assemblyJson(float value1, float value2, float value3, float value4, float value5, float value6, float value7, float value8, float value9, float value10, float value11, float value12, float value13, float value14, float value15, bool estado){
     // Memory pool for JSON object tree.
     //
     // Inside the brackets, 200 is the size of the pool in bytes.
     // Don't forget to change this value to match your JSON document.
     // Use arduinojson.org/assistant to compute the capacity.
-    StaticJsonBuffer<400> jsonBuffer;
+    StaticJsonBuffer<250> jsonBuffer;
     // StaticJsonBuffer allocates memory on the stack, it can be
     // replaced by DynamicJsonBuffer which allocates in the heap.
     //
@@ -49,15 +51,17 @@ String PROCESS_DATA::assemblyJson(int value1, int value2, int value3, int value4
     root["D8"] = value8;
     root["D9"] = value9;
     root["D10"] = value10;
+    /*
     root["D11"] = value11;
     root["D12"] = value12;
     root["D13"] = value13;
     root["D14"] = value14;
     root["D15"] = value15;
-
+    */
     root["status"] = estado;
     root["fecha"] = getTime();
-    char JSONmessageBuffer[400];
+    
+    char JSONmessageBuffer[maxLen];
     root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
     
     return String(JSONmessageBuffer);
@@ -92,24 +96,23 @@ String PROCESS_DATA::makeTest(){
 
 boolean PROCESS_DATA::procesarData(String Data)
 {
-    int data1 = getValue(Data,sep,0); 
-    int data2 = getValue(Data,sep,1); 
-    int data3 = getValue(Data,sep,2); 
-    int data4 = getValue(Data,sep,3); 
-    int data5 = getValue(Data,sep,4); 
-    int data6 = getValue(Data,sep,5); 
-    int data7 = getValue(Data,sep,6); 
-    int data8 = getValue(Data,sep,7); 
-    int data9 = getValue(Data,sep,8); 
-    int data10 = getValue(Data,sep,9); 
-    int data11 = 0; 
-    int data12 = 0; 
-    int data13 = 0; 
-    int data14 = 0; 
-    int data15 = 0;
+    float data1 = getValue(Data,sep,0); 
+    float data2 = getValue(Data,sep,1); 
+    float data3 = getValue(Data,sep,2); 
+    float data4 = getValue(Data,sep,3); 
+    float data5 = getValue(Data,sep,4); 
+    float data6 = getValue(Data,sep,5); 
+    float data7 = getValue(Data,sep,6); 
+    float data8 = getValue(Data,sep,7); 
+    float data9 = getValue(Data,sep,8); 
+    float data10 = getValue(Data,sep,9); 
+    float data11 = 0; 
+    float data12 = 0; 
+    float data13 = 0; 
+    float data14 = 0; 
+    float data15 = 0;
 
-    bool state = digitalRead(relayPin);  
-    EEPROM.write(relayEEPROMAdressState, state);
+    bool state = EEPROM.read(relayEEPROMAdressState);  
     
     int deltaData1 = abs(__data1 - data1);
     int deltaData2 = abs(__data2 - data2);
@@ -240,5 +243,5 @@ float PROCESS_DATA::getValue(String data, char separator, int index)
         }
     }
     String temporalS = found > index ? (data.substring(strIndex[0], strIndex[1])) : "0";
-    return (round(temporalS.toFloat()*10)/10);
+    return (temporalS.toFloat());
 }
