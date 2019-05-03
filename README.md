@@ -1,40 +1,27 @@
-﻿Sistema de supervision y apagado remoto para equipos de impresion 3D.
+Sistema de supervision y apagado remoto para equipos de impresion 3D.
 ==========
 
 El monitoreo y control remoto de las impresoras 3D es fundamental para aumentar la calidad del producto finalizado,
 Por esta razon para el año 2018 se propone como tesis el realizar este sistema aplicado y desarrollado sobre la impresora
 Printmated3D y que proximamente se extendera para cualquier modelo de impresora 3D.
 
-Library required:
--------------------
-1. [Libreria del sistema de supervision - permite realizar la lectura de los sensores](https://github.com/miguel5612/3DSupervisionLib)
-2. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
-
 requisitos:
 --------------------
-1. [Estar registrado en on3D.com](wwww.onmotica.xyz) [o tener la pagina web en tu hosting local](https://github.com/miguel5612/on3D)
-2. [Tener el dispositivo de monitoreo instalado en tu impresora](#)
+1. [Estar registrado en ohub](http://onhub.onmotica.com) [o tener la pagina web en tu hosting local](https://github.com/miguel5612/OnMonitor_Web)
+2. [Tener el dispositivo de monitoreo instalado en tu impresora (sigue las instrucciones)](https://www.instructables.com/editInstructable/publish/EJFZ8A8JV77JMW5)
 
-Hardware para ensamblar tu dispositivo de monitoreo:
---------------------
-
-1. [Board ON3D](#).
-2. [Kit de termistores](#).
-3. [Fuente de poder 12V - 1A](#).
 
 Componentes del proyecto:
 --------------------
 
-1. [Sistema de administracion web para equipos 3D](onmotica.com)
-2. [Dispositivo de supervision y apagado remoto](github.com)
+1. [Sistema de administracion web para equipos 3D](onhub.onmotica.com)
+2. [Dispositivo de supervision y apagado remoto](https://github.com/miguel5612/sistema-de-supervision-y-apagado-remoto-para-equipos-de-impresion-3D./tree/master/Software/V2.0 New!!!)
 
 Micromodulos:
 --------------------
 
-1. [Firmware para el nodemcu](https://github.com/miguel5612/Node-mcu-v3.00-micropython-firmware)
-2. [Libreria para medir potencia](https://github.com/miguel5612/PZEM004T)
-3. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
-4. [Dispositivo de prueba - medidor de temperatura 24/7](https://github.com/miguel5612/OnMonitor_Web)
+1. [Libreria para medir potencia](https://github.com/miguel5612/PZEM004T)
+2. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
 
 Documentacion:
 --------------------
@@ -52,4 +39,3 @@ Contacto:
 + sergioivanqa@ufps.edu.co
 + miguelangelcu@ufps.edu.co - 3192597748
 + carlosmauriciopc@ufps.edu.co - 3208780552
-
