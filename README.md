@@ -8,7 +8,7 @@ Printmated3D y que proximamente se extendera para cualquier modelo de impresora 
 requisitos:
 --------------------
 1. [Estar registrado en ohub](http://onhub.onmotica.com) [o tener la pagina web en tu hosting local](https://github.com/miguel5612/OnMonitor_Web)
-2. [Tener el dispositivo de monitoreo instalado en tu impresora (sigue las instrucciones)](https://www.instructables.com/editInstructable/publish/EJFZ8A8JV77JMW5)
+2. [Tener el dispositivo de monitoreo instalado en tu impresora (sigue las instrucciones)](https://www.instructables.com/id/Remote-Monitoring-and-Shutdown-System-for-3D-Print/)
 
 
 Componentes del proyecto:
