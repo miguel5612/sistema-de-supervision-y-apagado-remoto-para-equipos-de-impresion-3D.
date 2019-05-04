@@ -22,6 +22,8 @@ Micromodulos:
 
 1. [Libreria para medir potencia](https://github.com/miguel5612/PZEM004T)
 2. [Libreria thermistor - Permite la lectura de termistores NTC](https://github.com/miguel5612/Arduino-ThermistorLibrary)
+3. [Configuraciones del vps](https://github.com/miguel5612/VPS_Settings_Full/blob/master/README.md)
+4. [codigo del servidor onhub airQ](https://github.com/miguel5612/OnMonitor_Web)
 
 Documentacion:
 --------------------
