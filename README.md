@@ -16,7 +16,7 @@ Componentes del proyecto:
 
 1. [Sistema de administracion web para equipos 3D](onhub.onmotica.com)
 
-2. Dispositivo de supervision y apagado remoto
+2. [Dispositivo de supervision y apagado remoto](https://easyeda.com/miguelangelcu/Sistema-de-supervision-y-apagado-remoto-para-equipos-de-impresion-3D)
 
 Micromodulos:
 --------------------
